@@ -25,7 +25,7 @@ class SoftDeletes(models.Model):
         abstract = True
 
 
-class EndpointModel(Timestampable, SoftDeletes, models.Model):
+class Endpoint(Timestampable, SoftDeletes, models.Model):
     
     user        = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     endpoint    = models.URLField()
@@ -35,5 +35,5 @@ class EndpointModel(Timestampable, SoftDeletes, models.Model):
 
 class Request(Timestampable, SoftDeletes, models.Model):
 
-    endpoint    = models.ForeignKey(EndpointModel, on_delete=models.CASCADE)
+    endpoint    = models.ForeignKey(Endpoint, on_delete=models.CASCADE)
     result      = models.SmallIntegerField()
