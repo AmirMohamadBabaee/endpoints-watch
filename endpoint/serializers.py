@@ -25,6 +25,16 @@ class UserSerializer(serializers.ModelSerializer):
 
 class EndpointSerializer(serializers.ModelSerializer):
 
+    def validate(self, data):
+
+        print('data:', data)
+        user_endpoints = Endpoint.objects.filter(user==data['user'])
+        
+        if len(user_endpoints) > 20:
+            raise serializers.ValidationError("the user exceed endpoint creation limitation")
+
+        return data
+
     class Meta:
         model = Endpoint
         fields = '__all__'
