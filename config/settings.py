@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     # third-party 
     'rest_framework',
+    'django_crontab',
 
     # own
     'endpoint',
