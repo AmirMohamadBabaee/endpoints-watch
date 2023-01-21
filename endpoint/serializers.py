@@ -1,5 +1,7 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 from django.contrib.auth import get_user_model
+from config.settings import USER_ENDPOINT_CREATION_LIMIT
 from .models import Endpoint, Request
 
 UserModel = get_user_model()
@@ -32,19 +34,28 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class EndpointCreateSerializer(serializers.ModelSerializer):
 
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     def validate(self, data):
 
-        print('data:', self.context['request'].user.id)
-        user_endpoints = Endpoint.objects.filter(user=self.context['request'].user.id)
+        user_endpoints = Endpoint.objects.filter(user=data['user'].id)
         
-        if len(user_endpoints) > 20:
-            raise serializers.ValidationError("the user exceed endpoint creation limitation")
+        if len(user_endpoints) > USER_ENDPOINT_CREATION_LIMIT:
+            raise serializers.ValidationError("the user exceed endpoint creation limit")
 
         return data
 
     class Meta:
         model = Endpoint
-        exclude = ('fail_times', 'user')
+        read_only_fields = ['fail_times']
+        fields = '__all__'
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Endpoint.objects.all(),
+                fields=['user', 'endpoint'],
+                message='The user has already monitored this endpoint'
+            )
+        ]
 
 
 class EndpointListSerializer(serializers.ModelSerializer):
