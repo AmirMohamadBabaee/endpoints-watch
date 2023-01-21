@@ -20,15 +20,22 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserModel
-        fields = ( "id", "username", "password", )
+        fields = ("username", "password", )
 
 
-class EndpointSerializer(serializers.ModelSerializer):
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserModel
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'date_joined')
+
+
+class EndpointCreateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
 
-        print('data:', data)
-        user_endpoints = Endpoint.objects.filter(user==data['user'])
+        print('data:', self.context['request'].user.id)
+        user_endpoints = Endpoint.objects.filter(user=self.context['request'].user.id)
         
         if len(user_endpoints) > 20:
             raise serializers.ValidationError("the user exceed endpoint creation limitation")
@@ -37,7 +44,18 @@ class EndpointSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Endpoint
+        exclude = ('fail_times', 'user')
+
+
+class EndpointListSerializer(serializers.ModelSerializer):
+
+    user = UserProfileSerializer()
+
+    class Meta:
+        model = Endpoint
         fields = '__all__'
+        depth = 1
+        read_only_fields = ['fail_times']
 
 
 class RequestSerializer(serializers.ModelSerializer):

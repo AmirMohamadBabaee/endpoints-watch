@@ -2,7 +2,7 @@ from rest_framework import permissions
 from rest_framework.generics import CreateAPIView, ListAPIView
 from django.contrib.auth import get_user_model
 
-from .serializers import UserSerializer, EndpointSerializer, RequestSerializer
+from .serializers import UserSerializer, EndpointCreateSerializer, EndpointListSerializer, RequestSerializer
 from .models import Endpoint, Request
 
 
@@ -19,19 +19,22 @@ class CreateEndpointView(CreateAPIView):
 
     model = Endpoint
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = EndpointSerializer
+    serializer_class = EndpointCreateSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class ListUserEndpointView(ListAPIView):
 
     model = Endpoint
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = EndpointSerializer
+    serializer_class = EndpointListSerializer
 
     def get_queryset(self):
 
         user = self.request.user
-        return user.endpoints.all()
+        return user.endpoint_set.all()
 
 
 

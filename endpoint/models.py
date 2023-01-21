@@ -31,7 +31,10 @@ class Endpoint(Timestampable, SoftDeletes, models.Model):
     user        = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     endpoint    = models.URLField()
     threshold   = models.PositiveIntegerField()
-    fail_times  = models.PositiveIntegerField()
+    fail_times  = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ('user', 'endpoint',)
 
 
 class Request(Timestampable, SoftDeletes, models.Model):
