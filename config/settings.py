@@ -120,6 +120,10 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
 }
 
+CRONJOBS = [
+    ('* * * * *', 'endpoint.cron.cron_func', '>> /tmp/cron_func.log')
+]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
