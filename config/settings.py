@@ -41,7 +41,6 @@ INSTALLED_APPS = [
 
     # third-party 
     'rest_framework',
-    'django_crontab',
 
     # own
     'endpoint',
@@ -120,10 +119,6 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
 }
 
-CRONJOBS = [
-    ('* * * * *', 'endpoint.cron.cron_func', '>> /tmp/cron_func.log')
-]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
@@ -147,3 +142,4 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 USER_ENDPOINT_CREATION_LIMIT = 20
+REQUEST_INTERVAL = 30
