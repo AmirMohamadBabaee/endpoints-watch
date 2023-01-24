@@ -3,6 +3,7 @@ from rest_framework.validators import UniqueTogetherValidator
 from django.contrib.auth import get_user_model
 from config.settings import USER_ENDPOINT_CREATION_LIMIT
 from .models import Endpoint, Request
+from datetime import datetime, timedelta
 
 UserModel = get_user_model()
 
@@ -78,20 +79,23 @@ class EndpointBaseSerializer(serializers.ModelSerializer):
 
 class RequestSerializer(serializers.ModelSerializer):
 
-    endpoint = EndpointBaseSerializer(read_only=True)
-
     class Meta:
         model = Request
-        depth = 1
         fields = '__all__'
 
 
 class EndpointRequestSerializer(serializers.ModelSerializer):
 
+    requests = serializers.SerializerMethodField()
+
     class Meta:
         model = Endpoint
         depth = 1
-        fields = ['id', 'endpoint', 'created_at', 'updated_at', 'threshold', 'fail_times', 'request_set']
+        fields = ['id', 'endpoint', 'created_at', 'updated_at', 'threshold', 'fail_times', 'requests']
+
+    def get_requests(self, obj):
+        datetime_24_hours_ago = datetime.now() - timedelta(days=1)
+        return RequestSerializer(obj.request_set.filter(created_at__gte=datetime_24_hours_ago), many=True).data
 
 
 class EndpointWarningSerializer(serializers.ModelSerializer):
