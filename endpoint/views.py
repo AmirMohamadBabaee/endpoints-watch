@@ -1,8 +1,15 @@
 from rest_framework import permissions
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import RetrieveAPIView, CreateAPIView, ListAPIView
 from django.contrib.auth import get_user_model
+from rest_framework.generics import get_object_or_404
 
-from .serializers import UserSerializer, EndpointCreateSerializer, EndpointListSerializer, RequestSerializer
+from .serializers import (
+    UserSerializer, 
+    EndpointCreateSerializer, 
+    EndpointListSerializer, 
+    EndpointRequestSerializer,
+    EndpointWarningSerializer,
+)
 from .models import Endpoint, Request
 
 
@@ -37,4 +44,19 @@ class ListUserEndpointView(ListAPIView):
         return user.endpoint_set.all()
 
 
+class EndpointRequestListView(RetrieveAPIView):
 
+    model = Endpoint
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = EndpointRequestSerializer
+
+    def get_object(self):
+        
+        return get_object_or_404(Endpoint, pk=self.kwargs['pk'])
+
+
+class EndpointWarningView(ListAPIView):
+
+    model = Endpoint
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = EndpointWarningSerializer

@@ -69,8 +69,36 @@ class EndpointListSerializer(serializers.ModelSerializer):
         read_only_fields = ['fail_times']
 
 
+class EndpointBaseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Endpoint
+        fields = ['id', 'endpoint', 'threshold', 'fail_times']
+
+
 class RequestSerializer(serializers.ModelSerializer):
+
+    endpoint = EndpointBaseSerializer(read_only=True)
 
     class Meta:
         model = Request
+        depth = 1
         fields = '__all__'
+
+
+class EndpointRequestSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Endpoint
+        depth = 1
+        fields = ['id', 'endpoint', 'created_at', 'updated_at', 'threshold', 'fail_times', 'request_set']
+
+
+class EndpointWarningSerializer(serializers.ModelSerializer):
+
+    requests = RequestSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Endpoint
+        depth = 1
+        fields = ['endpoint', 'threshold', 'fail_times']
