@@ -100,9 +100,6 @@ class EndpointRequestSerializer(serializers.ModelSerializer):
 
 class EndpointWarningSerializer(serializers.ModelSerializer):
 
-    requests = RequestSerializer(read_only=True, many=True)
-
     class Meta:
         model = Endpoint
-        depth = 1
-        fields = ['endpoint', 'threshold', 'fail_times']
+        fields = ['endpoint', 'created_at', 'updated_at', 'threshold', 'fail_times']

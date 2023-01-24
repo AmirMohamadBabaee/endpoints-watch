@@ -1,6 +1,7 @@
 from rest_framework import permissions
 from rest_framework.generics import RetrieveAPIView, CreateAPIView, ListAPIView
 from django.contrib.auth import get_user_model
+from django.db.models import F
 from rest_framework.generics import get_object_or_404
 
 from .serializers import (
@@ -10,7 +11,7 @@ from .serializers import (
     EndpointRequestSerializer,
     EndpointWarningSerializer,
 )
-from .models import Endpoint, Request
+from .models import Endpoint
 
 
 class CreateUserView(CreateAPIView):
@@ -60,3 +61,7 @@ class EndpointWarningView(ListAPIView):
     model = Endpoint
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = EndpointWarningSerializer
+
+    def get_queryset(self):
+        return Endpoint.objects.filter(fail_times__gt=F('threshold'))
+    
