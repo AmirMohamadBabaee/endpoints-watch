@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth import get_user_model
 
 
@@ -32,6 +33,12 @@ class Endpoint(Timestampable, SoftDeletes, models.Model):
     endpoint    = models.URLField()
     threshold   = models.PositiveIntegerField()
     fail_times  = models.PositiveIntegerField(default=0, editable=False)
+
+    def get_fail_times(self):
+        fail_counter = self.request_set.filter(Q(result__lt=200) | Q(result__gte=300)).count()
+        self.fail_times = fail_counter
+        self.save()
+        return fail_counter
 
     class Meta:
         unique_together = ('user', 'endpoint',)

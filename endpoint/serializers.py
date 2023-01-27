@@ -62,6 +62,7 @@ class EndpointCreateSerializer(serializers.ModelSerializer):
 class EndpointListSerializer(serializers.ModelSerializer):
 
     user = UserProfileSerializer()
+    fail_times = serializers.SerializerMethodField()
 
     class Meta:
         model = Endpoint
@@ -69,12 +70,20 @@ class EndpointListSerializer(serializers.ModelSerializer):
         depth = 1
         read_only_fields = ['fail_times']
 
+    def get_fail_times(self, instance):
+        return instance.get_fail_times()
+
 
 class EndpointBaseSerializer(serializers.ModelSerializer):
+
+    fail_times = serializers.SerializerMethodField()
 
     class Meta:
         model = Endpoint
         fields = ['id', 'endpoint', 'threshold', 'fail_times']
+
+    def get_fail_times(self, instance):
+        return instance.get_fail_times()
 
 
 class RequestSerializer(serializers.ModelSerializer):
@@ -87,11 +96,15 @@ class RequestSerializer(serializers.ModelSerializer):
 class EndpointRequestSerializer(serializers.ModelSerializer):
 
     requests = serializers.SerializerMethodField()
+    fail_times = serializers.SerializerMethodField()
 
     class Meta:
         model = Endpoint
         depth = 1
         fields = ['id', 'endpoint', 'created_at', 'updated_at', 'threshold', 'fail_times', 'requests']
+
+    def get_fail_times(self, instance):
+        return instance.get_fail_times()
 
     def get_requests(self, obj):
         datetime_24_hours_ago = datetime.now() - timedelta(days=1)
@@ -100,6 +113,11 @@ class EndpointRequestSerializer(serializers.ModelSerializer):
 
 class EndpointWarningSerializer(serializers.ModelSerializer):
 
+    fail_times = serializers.SerializerMethodField()
+
     class Meta:
         model = Endpoint
         fields = ['endpoint', 'created_at', 'updated_at', 'threshold', 'fail_times']
+
+    def get_fail_times(self, instance):
+        return instance.get_fail_times()

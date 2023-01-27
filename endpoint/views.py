@@ -53,7 +53,8 @@ class EndpointRequestListView(RetrieveAPIView):
 
     def get_object(self):
         
-        return get_object_or_404(Endpoint, pk=self.kwargs['pk'])
+        user = self.request.user
+        return get_object_or_404(user.endpoint_set, pk=self.kwargs['pk'])
 
 
 class EndpointWarningView(ListAPIView):
@@ -63,5 +64,7 @@ class EndpointWarningView(ListAPIView):
     serializer_class = EndpointWarningSerializer
 
     def get_queryset(self):
-        return Endpoint.objects.filter(fail_times__gt=F('threshold'))
+
+        user = self.request.user
+        return user.endpoint_set.filter(fail_times__gte=F('threshold'))
     
